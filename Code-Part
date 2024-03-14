@@ -1,0 +1,413 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © omersabriklc
+
+//@version=5
+indicator("Komut dosyam",overlay=true)
+import TradingView/ta/5
+
+var table1=table.new(position = position.middle_right,columns = 2,rows = 6,bgcolor = color.white,border_color = color.black,border_width = 2)
+var table2=table.new(position = position.middle_left,columns = 2,rows = 6,bgcolor = color.white,border_color = color.black,border_width = 2)
+var table3=table.new(position = position.top_center,columns = 5,rows=2,bgcolor = color.white,border_color = color.black,border_width = 2)
+var table4=table.new(position = position.bottom_center,columns = 6,rows=2,bgcolor = color.white,border_color = color.black,border_width = 2)
+
+src=input.source(defval=close,title="Source",group="SOURCE")
+
+
+timeframeFor_table1=input.timeframe("15",title="TimeFrame",group = "TIMEFRAMES")
+timeframeFor_table2=input.timeframe("15",title = "TimeFrame 2",group = "TIMEFRAMES")
+timeframeFor_table3=input.timeframe("15",title = "TimeFrame 3",group = "TIMEFRAMES")
+timeframeFor_table4=input.timeframe("15",title = "TimeFrame 4",group = "TIMEFRAMES")
+
+value=input.int(defval=50,title="Value 1",group="Highest - Lowest VALUES")
+
+fiboValue=input.int(defval=100,title="For Fibonacci",group = "Fibonacci")
+
+// stochvalue=input.int(3,title="ta.stoch value",group = " STOCH VALUES")
+
+//Momentum Values
+mfiValue=input.int(defval = 14,title="MFI Value",group = "Momentum VALUES")
+momValue=input.int(defval=10,title = "MOM Value",group = "Momentum VALUES")
+cmoValue=input.int(defval=9,title="CMO Value",group = "Momentum VALUES")
+
+macdLineValue=input.int(12,title="Macd Line Value",group="Momentum VALUES")
+signalLineValue=input.int(26,title="Signal Line Value",group="Momentum VALUES")
+histLineValue=input.int(9,title="Hist Line Value",group="Momentum VALUES")
+
+//ITUM Values
+smashorttermValue=input.int(defval=50,title="Sma-ShortTerm",group="ITUM VALUES")
+smalongtermValue=input.int(defval = 200,title = "Sma-LongTerm",group = "ITUM VALUES")
+rsiValue=input.int(defval = 14,title="RSI Value",group = "ITUM VALUES")
+
+//MA Values (Apart from sma)
+inputforema=input.int(8,title="EMA Value",group="Moving Average VALUES")
+inputforhma=input.int(16,title="HMA Value",group="Moving Average VALUES")
+inputforwma=input.int(20,title="WMA Value",group="Moving Average VALUES")
+inputforrma=input.int(15,title="RMA Value",group="Moving Average VALUES")
+
+//MACD
+[macdLine, signalLine, histLine] = ta.macd(src, macdLineValue, signalLineValue, histLineValue)
+
+fibonacciValues=input.string("%23.6",title="Fibonacci Values",group = "FIBONACCI VALUES",options = ["%23.6","%38.2","%50.0","%61.8","%100"])
+fiboHighesthigh=ta.highest(high,fiboValue)
+fiboLowestlow=ta.lowest(low,fiboValue)
+q=str.tonumber(fibonacciValues)
+symbol1=syminfo.tickerid
+symbol2=syminfo.tickerid
+symbol3=syminfo.tickerid
+symbol4=syminfo.tickerid
+
+//ta.func's
+smashort=ta.sma(src,smashorttermValue)
+smalong=ta.sma(src,smalongtermValue)
+rsi=ta.rsi(src,rsiValue)
+mfi=ta.mfi(hlc3,mfiValue)
+momentum=ta.mom(src,momValue)
+cmo=ta.cmo(src,cmoValue)
+
+ema_for_table=ta.ema(src,inputforema)
+hma_for_table=ta.hma(src,inputforhma)
+wma_for_table=ta.wma(src,inputforwma)
+rma_for_table=ta.rma(src,inputforrma)
+
+//for Fibonacci
+//hesaplamalar chat gpt kullanılarak yapıldı
+forFibonacci(fibonacciValuess)=>
+    valuee=0.0
+    if fibonacciValuess=="%23.6"
+        valuee:=fiboHighesthigh-0.236*(fiboHighesthigh-fiboLowestlow)
+    if fibonacciValuess=="%38.2"
+        valuee:=fiboHighesthigh-0.382*(fiboHighesthigh-fiboLowestlow)
+    if fibonacciValuess=="%50.0"
+        valuee:=fiboHighesthigh-0.5*(fiboHighesthigh-fiboLowestlow)
+    if fibonacciValuess=="%61.8"
+        valuee:=fiboHighesthigh-0.618*(fiboHighesthigh-fiboLowestlow)
+    if fibonacciValuess=="%78.6"
+        valuee:=fiboHighesthigh-0.786*(fiboHighesthigh-fiboLowestlow)
+    if fibonacciValuess=="%100"
+        valuee:=fiboHighesthigh
+    valuee
+
+emaif= if ema_for_table>ema_for_table[1]
+    colorr=color.green
+else if ema_for_table[1]>ema_for_table
+    colorr=color.red
+else
+    colorr=color.white
+
+hmaif= if hma_for_table>hma_for_table[1]
+    colorr=color.green
+else if hma_for_table[1]>hma_for_table
+    colorr=color.red
+else
+    colorr=color.white
+
+
+wmaif= if wma_for_table>wma_for_table[1]
+    colorr=color.green
+else if wma_for_table[1]>wma_for_table
+    colorr=color.red
+else
+    colorr=color.white
+
+
+rmaif= if rma_for_table>rma_for_table[1]
+    colorr=color.green
+else if rma_for_table[1]>rma_for_table
+    colorr=color.red
+else
+    colorr=color.white
+
+sma_short_if= if smashort>smashort[1]
+    colorr=color.green
+else if smashort[1]>smashort
+    colorr=color.red
+else
+    colorr=color.white
+
+sma_long_if= if smalong>smalong[1]
+    colorr=color.green
+else if smalong[1]>smalong
+    colorr=color.red
+else
+    colorr=color.white
+
+rsi_if=if rsi>rsi[1]
+    colorr=color.green
+else if rsi[1]>rsi
+    colorr=color.red
+else
+    colorr=color.white
+
+mom_if=if momentum>momentum[1]
+    colorr=color.green
+else if momentum[1]>momentum
+    colorr=color.red
+else
+    colorr=color.white
+
+cmo_if=if cmo>cmo[1]
+    colorr=color.green
+else if cmo[1]>cmo
+    colorr=color.red
+else
+    colorr=color.white
+
+mfi_if=if mfi>mfi[1]
+    colorr=color.green
+else if mfi[1]>mfi
+    colorr=color.red
+else
+    colorr=color.white
+
+
+writeallTimeframes(timeframee)=>
+    x="TimeFrame"
+    x:=str.tostring(timeframee)
+    x
+writeallSymbols(symboll)=>
+    x=""
+    x:=symboll
+    x
+
+smayaziDegisimi(variablee)=>
+    yazi="Symbol"
+    yazi := "SMA" + "(" + str.tostring(variablee,format.volume) + ")" 
+    yazi
+
+rsiyaziDegisimi(variablee)=>
+    yazi="Symbol"
+    yazi := "RSI" + "(" + str.tostring(variablee,format.volume) + ")" 
+    yazi
+
+mfiyaziDegisimi(variablee)=>
+    yazi="Symbol"
+    yazi := "MFI" + "(" + str.tostring(variablee,format.volume) + ")" 
+    yazi
+
+momentumyaziDegisimi(variablee)=>
+    yazi="Symbol"
+    yazi := "MOM" + "(" + str.tostring(variablee,format.volume) + ")" 
+    yazi
+
+cmoyaziDegisimi(variablee)=>
+    yazi="Symbol"
+    yazi := "CMO" + "(" + str.tostring(variablee,format.volume) + ")" 
+    yazi
+
+emayaziDegisimi(variablee)=>
+    yazi="Symbol"
+    yazi:="EMA" + "(" + str.tostring(variablee,format.volume) + ")"
+    yazi
+
+hmayaziDegisimi(variablee)=>
+    yazi="Symbol"
+    yazi:="HMA" + "(" + str.tostring(variablee,format.volume) + ")"
+    yazi
+
+wmayaziDegisimi(variablee)=>
+    yazi="Symbol"
+    yazi:="WMA" + "(" + str.tostring(variablee,format.volume) + ")"
+    yazi
+
+rmayaziDegisimi(variablee)=>
+    yazi="Symbol"
+    yazi:="RMA" + "(" + str.tostring(variablee,format.volume) + ")"
+    yazi
+
+volumeyaziDegisimi()=>
+    yazi="Symbol"
+    yazi := "Volume"
+    yazi
+fibonacciyaziDegisimi(fibonacciValues)=>
+    yazi="Symbol"
+    yazi := "Fibonacci" + "(" + fibonacciValues + ")" 
+    yazi
+
+getrequestSecurity(symboll,timeframee,expr)=>
+    a=request.security("","","")
+    a:=str.tostring(request.security(symboll,timeframee,expr),format.mintick)
+    a
+
+getMACDmacdandsignalandhist(useSymbolFunc,macdLinee,signalLinee,histLinee)=>
+    a=writeallSymbols(useSymbolFunc) + "/ " + str.tostring(macdLinee) +" / " + str.tostring(signalLinee) + " / " + str.tostring(histLinee)
+
+
+highest=str.tonumber(getrequestSecurity(writeallSymbols(symbol3),timeframeFor_table3,ta.highest(value))) //50 çubuk
+lowest=str.tonumber(getrequestSecurity(writeallSymbols(symbol3),timeframeFor_table3,ta.lowest(value)))   //50 çubuk
+rangee=highest-lowest
+
+highest_if=if highest>highest[1]
+    colorr=color.green
+else if highest[1]>highest
+    colorr=color.red
+else
+    colorr=color.white
+
+lowest_if=if lowest>lowest[1]
+    colorr=color.green
+else if lowest[1]>lowest
+    colorr=color.red
+else
+    colorr=color.white
+
+range_if=if rangee>rangee[1]
+    colorr=color.green
+else if rangee[1]>rangee
+    colorr=color.red
+else
+    colorr=color.white
+
+ohlc_if=if ohlc4>ohlc4[1]
+    colorr=color.green
+else if ohlc4[1]>ohlc4
+    colorr=color.red
+else
+    colorr=color.white
+
+if barstate.islast
+    table.cell(table1,column = 0,row = 0,text="Indicators That Used Most",text_color = color.black)
+    table.cell(table1,column = 0,row = 1,text=writeallSymbols(symbol1) + "(" + "ohlc/4" + ")",text_color = color.black)
+    table.cell(table1,column = 0,row = 2,text=smayaziDegisimi(smashorttermValue),text_color = color.black)
+    table.cell(table1,column = 0,row = 3,text=smayaziDegisimi(smalongtermValue),text_color = color.black)
+    table.cell(table1,column = 0,row = 4,text=rsiyaziDegisimi(rsiValue),text_color = color.black)
+    table.cell(table1,column = 0,row=5,text=fibonacciyaziDegisimi(fibonacciValues),text_color = color.black)
+
+    table.cell(table1,column = 1,row=0,text=writeallTimeframes(timeframeFor_table1),text_color = color.black)
+    table.cell(table1,column = 1,row=1,text=getrequestSecurity(writeallSymbols(symbol1),timeframeFor_table1,ohlc4),text_color = color.black,bgcolor = ohlc_if)
+    table.cell(table1,column = 1,row=2,text=getrequestSecurity(writeallSymbols(symbol1),timeframeFor_table1,str.tonumber(str.tostring(smashort,format.mintick))),text_color = color.black,bgcolor = sma_short_if)
+    table.cell(table1,column = 1,row=3,text=getrequestSecurity(writeallSymbols(symbol1),timeframeFor_table1,str.tonumber(str.tostring(smalong,format.mintick))),text_color = color.black,bgcolor = sma_long_if)
+    table.cell(table1,column = 1,row=4,text=getrequestSecurity(writeallSymbols(symbol1),timeframeFor_table1,str.tonumber(str.tostring(rsi,format.mintick))),text_color = color.black,bgcolor = rsi_if)
+    table.cell(table1,column = 1,row=5,text=str.tostring(forFibonacci(fibonacciValues),format.mintick),text_color = color.black)
+
+if barstate.islast
+    table.cell(table2,column = 0,row = 0,text="omersabriklc // MA ",text_color = color.black)
+    table.cell(table2,column = 0,row = 1,text=writeallSymbols(symbol2) + "(" + "ohlc/4" + ")",text_color = color.black)
+    table.cell(table2,column = 0,row = 2,text=emayaziDegisimi(inputforema),text_color = color.black)
+    table.cell(table2,column = 0,row = 3,text=hmayaziDegisimi(inputforhma),text_color = color.black)
+    table.cell(table2,column = 0,row = 4,text=wmayaziDegisimi(inputforwma),text_color = color.black)
+    table.cell(table2,column = 0,row = 5,text=rmayaziDegisimi(inputforrma),text_color = color.black)
+
+    table.cell(table2,column = 1,row = 0,text=writeallTimeframes(timeframeFor_table2),text_color = color.black)
+    table.cell(table2,column = 1,row = 1,text=getrequestSecurity(writeallSymbols(symbol2),timeframeFor_table2,ohlc4),text_color = color.black,bgcolor = ohlc_if)
+    table.cell(table2,column = 1,row = 2,text=getrequestSecurity(writeallSymbols(symbol2),timeframeFor_table2,str.tonumber(str.tostring(ema_for_table,format.mintick))),text_color =color.black,bgcolor = emaif)
+    table.cell(table2,column = 1,row = 3,text=getrequestSecurity(writeallSymbols(symbol2),timeframeFor_table2,str.tonumber(str.tostring(hma_for_table,format.mintick))),text_color = color.black,bgcolor = hmaif)
+    table.cell(table2,column = 1,row = 4,text=getrequestSecurity(writeallSymbols(symbol2),timeframeFor_table2,str.tonumber(str.tostring(wma_for_table,format.mintick))),text_color = color.black,bgcolor=wmaif)
+    table.cell(table2,column = 1,row = 5,text=getrequestSecurity(writeallSymbols(symbol2),timeframeFor_table2,str.tonumber(str.tostring(rma_for_table,format.mintick))),text_color = color.black,bgcolor = rmaif)
+
+if barstate.islast
+    table.cell(table3,column = 0,row = 0,text="Highest-Lowest",text_color = color.black)
+    table.cell(table3,column = 0,row = 1,text=writeallTimeframes(timeframeFor_table3),text_color = color.black)
+
+    table.cell(table3,column = 1,row = 0,text=writeallSymbols(symbol3) + "(" + "ohlc/4" + ")",text_color = color.black)
+    table.cell(table3,column = 1,row = 1,text=getrequestSecurity(writeallSymbols(symbol3),timeframeFor_table3,ohlc4),text_color = color.black,bgcolor = ohlc_if)
+
+    table.cell(table3,column = 2,row = 0,text="Highest",text_color = color.black)
+    table.cell(table3,column = 2,row = 1,text=str.tostring(highest,format.mintick),text_color = color.black,bgcolor = highest_if)
+
+    table.cell(table3,column = 3,row = 0,text="Lowest",text_color = color.black)
+    table.cell(table3,column = 3,row = 1,text=str.tostring(lowest,format.mintick),text_color = color.black,bgcolor = lowest_if)
+
+    table.cell(table3,column = 4,row = 0,text="Range",text_color = color.black)
+    table.cell(table3,column = 4,row = 1,text=str.tostring(rangee,format.mintick),text_color = color.black,bgcolor = range_if)
+
+if barstate.islast
+    table.cell(table4,column = 0,row=0,text="Momentum",text_color = color.black)
+    table.cell(table4,column = 0,row=1,text=writeallTimeframes(timeframeFor_table4),text_color = color.black)
+
+    table.cell(table4,column = 1,row=0,text=writeallSymbols(symbol4) + "(" + "ohlc/4" + ")" ,text_color = color.black)
+    table.cell(table4,column = 1,row=1,text=getrequestSecurity(writeallSymbols(symbol4),timeframeFor_table4,ohlc4),text_color = color.black,bgcolor = ohlc_if)
+
+    table.cell(table4,column = 2,row=0,text=mfiyaziDegisimi(mfiValue),text_color = color.black)
+    table.cell(table4,column = 2,row=1,text=getrequestSecurity(writeallSymbols(symbol4),timeframeFor_table4,str.tonumber(str.tostring(mfi,format.mintick))),text_color = color.black,bgcolor = mfi_if)
+
+    table.cell(table4,column = 3,row=0,text=momentumyaziDegisimi(momValue),text_color = color.black)
+    table.cell(table4,column = 3,row=1,text=getrequestSecurity(writeallSymbols(symbol4),timeframeFor_table4,str.tonumber(str.tostring(momentum,format.mintick))),text_color = color.black,bgcolor = mom_if)
+
+    table.cell(table4,column = 4,row=0,text=cmoyaziDegisimi(cmoValue),text_color = color.black)
+    table.cell(table4,column = 4,row=1,text=getrequestSecurity(writeallSymbols(symbol4),timeframeFor_table4,str.tonumber(str.tostring(cmo,format.mintick))),text_color = color.black,bgcolor = cmo_if)
+
+    table.cell(table4,column = 5,row=0,text="MACD",text_color = color.black)
+    table.cell(table4,column = 5,row=1,text=getMACDmacdandsignalandhist(writeallSymbols(symbol4) , macdLine , signalLine , histLine),text_color=color.black)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// symbolsandmacdlinee(symboll,macdLinee)=>
+//     a=writeallSymbols(symboll)
+//     b=str.tostring(macdLinee)
+//     c=a + "/" + b
+
+// symbolsandsignallinee(symboll,signalLinee)=>
+//     a=writeallSymbols(symboll)
+//     b=str.tostring(signalLinee)
+//     c=a + "/" + b
+
+// symbolsandhistlinee(symboll,histLinee)=>
+//     a=writeallSymbols(symboll)
+//     b=str.tostring(histLinee)
+//     c=a + "/" + b
+
+// [macdLine, signalLine, histLine] = ta.macd(src, macdLineValue, signalLineValue, histLineValue)
+
+// stokastik=ta.stoch(ta.rsi(close,rsiValue),high,low,stochvalue)
+
+
+
+// table.cell(table4,column = 5,row=1,text=writeallSymbols(symbol4) +"/"+ symbolsandmacdlinee(symbol4,macdLine) +"/"+ symbolsandsignallinee(symbol4,signalLine)+"/"+ symbolsandhistlinee(symbol4,histLine),text_color = color.black)
+// symbolsandmacdlinee(symbol4,macdLine) + "/" + symbolsandsignallinee(symbol4,signalLine) + "/" + symbolsandhistlinee(symbol4,histLine)
+// getMACDmacdandsignalandhist(writeallSymbols(symbol4) , macdLine , signalLine , histLine)
+
+
+
+
+
+
+
+
+
+// fiboLookback=input.int(250,"lookback")
+// rsiforFibonacci=ta.rsi(close,14)
+// tepe=ta.highest(rsiforFibonacci,fiboLookback)
+// dip=ta.lowest(rsiforFibonacci,fiboLookback)
+// mutlakDeger(sayi)=>
+//     math.abs(sayi)
+
+// tepeyeUzaklik = mutlakDeger(ta.highestbars(fiboLookback))
+// dibeUzaklik = mutlakDeger(ta.lowestbars(fiboLookback))
+// q=str.tonumber(fibonacciValues)
+
+// fibHesapla(qq)=>
+//     dibeUzaklik > tepeyeUzaklik ? tepe-((tepe-dip)*qq/1000) : dip + ((tepe-dip)*qq/1000)
+
+// getrequestSecurity(writeallSymbols(symbol1),timeframeFor_table1,str.tonumber(str.tostring(fibHesapla(q),format.mintick)))
+
+
+
+
+
+// a=getrequestSecurity(writeallSymbols(symbol2),timeframeFor_table2,open)
+// b=getrequestSecurity(writeallSymbols(symbol2),timeframeFor_table2,open[1])
+// open_if=a>b
+// open_else_if=b>a
+
+
+// high_if=getrequestSecurity(writeallSymbols(symbol2),timeframeFor_table2,high)>getrequestSecurity(writeallSymbols(symbol2),timeframeFor_table2,high[1])
+// low_if=getrequestSecurity(writeallSymbols(symbol2),timeframeFor_table2,low)>getrequestSecurity(writeallSymbols(symbol2),timeframeFor_table2,low[1])
+// close_if=getrequestSecurity(writeallSymbols(symbol2),timeframeFor_table2,close)>getrequestSecurity(writeallSymbols(symbol2),timeframeFor_table2,close[1])
+
+// open_clause= if open_if
+//     colorr=color.green
+// else if open_else_if
+//     colorr=color.red
+// else
+//     colorr=color.white
